@@ -54,12 +54,11 @@ function sendMessage(recipientId, messageToSend) {
 	console.log('Enter in send message function with message :'+messageToSend);
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
-        //qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
-		qs: {access_token: facebookmessengerToken},
-        method: 'POST',
+        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+		method: 'POST',
         json: {
             recipient: {id: recipientId},
-            message: messageToSend,
+            message: {text:messageToSend},
         }
     }, function(error, response, body) {
         if (error) {
