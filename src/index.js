@@ -34,12 +34,12 @@ app.post('/webhook', function (req, res) {
     console.log('Enter in post');
     var events = req.body.entry[0].messaging;
 	console.log('Enter in post check body content');
-    for (i = 0; i < events.length; i++) {
+	for (let i = 0; i < events.length; i++) {
         var event = events[i];
         if (event.message && event.message.text) {
-			console.log('Received from FB Messnger :'+event.message.text);
+			console.log('Received from FB Messenger :'+event.message.text);
 		    //sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
-			//processUserInput(event.sender.id,event.message.text);
+			processUserInput(event.sender.id,event.message.text);
         }
     }
     res.sendStatus(200);
