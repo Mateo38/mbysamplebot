@@ -8,6 +8,7 @@ var app = express();
 // Recasst token & const
 const recastRequestToken = '9a1f7bb74659e58db1ae933fbba0d2ad';
 const recastClient = new recast.Client(recastRequestToken);
+const facebookmessengerToken= 'EAAOP78EZA4OEBAEBaqWYaD5ZAKPSf0ZCWDquK7eEf7ZB2FuTncztBEmuMWEy7XhZByZCl3ZCDVnZA0ThV8XBwCR3Va8ssVaXIjxZAeGeCvk49pmHpKsHNywu7yMvNOZCglPPXaD8x6HYdtiJPM58msr2zIZCt19oROS2IaFOptfNiJAIQZDZD';
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -51,7 +52,8 @@ function sendMessage(recipientId, message) {
 	console.log('Enter in send message function with message :'+message);
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+        //qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+		qs: {access_token: facebookmessengerToken},
         method: 'POST',
         json: {
             recipient: {id: recipientId},
