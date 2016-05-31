@@ -39,7 +39,7 @@ app.post('/webhook', function (req, res) {
         if (event.message && event.message.text) {
 			console.log('Received from FB Messnger :'+event.message.text);
 		    //sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
-			processUserInput(event.sender.id,event.message.text);
+			//processUserInput(event.sender.id,event.message.text);
         }
     }
     res.sendStatus(200);
