@@ -47,6 +47,7 @@ app.post('/webhook', function (req, res) {
 
 // generic function sending messages
 function sendMessage(recipientId, message) {
+	console.log('RecipientId :'+recipientId);
 	console.log('Enter in send message function with message :'+message);
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
@@ -54,7 +55,7 @@ function sendMessage(recipientId, message) {
         method: 'POST',
         json: {
             recipient: {id: recipientId},
-            message: "test",
+            message: 'test',
         }
     }, function(error, response, body) {
         if (error) {
