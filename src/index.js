@@ -40,9 +40,12 @@ app.post('/webhook', function (req, res) {
         if (event.message && event.message.text) {
 			console.log('Received from FB Messenger :'+event.message.text);
 		    //sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
-			let messageFromRecast=processUserInput(event.message.text);
-			console.log('Response from recast engine :'+messageFromRecast);
-			sendMessage(event.sender.id,messageFromRecast);
+			processUserInput(event.message.text,function(recastAnswer)
+			{
+				console.log('Response from recast engine :'+recastAnswer);
+				sendMessage(event.sender.id,recastAnswer);
+			});
+			
         }
     }
     res.sendStatus(200);
@@ -54,8 +57,9 @@ function sendMessage(recipientId, messageToSend) {
 	console.log('Enter in send message function with message :'+messageToSend);
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
-		method: 'POST',
+        //qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+		qs: {access_token: facebookmessengerToken},
+        method: 'POST',
         json: {
             recipient: {id: recipientId},
             message: {text:messageToSend},
@@ -228,11 +232,10 @@ var getRaceDateRange = function(raceDateRawValue) {
 
 };
 
-var processUserInput = function(userInput) {
-    let recastAnswer='Je n\'ai pas compris :-(';
+var processUserInput = function (userInput,recAns) {
     
-	// Request Recast to process user input
-    recastClient.textRequest(userInput, (response, err) => {
+		// Request Recast to process user input
+		recastClient.textRequest(userInput, (response, err) => {
         if (response.intent() === 'find-race') {
             // Analyse the asked race type
             let entityRaceType = response.get('racetype');
@@ -242,17 +245,15 @@ var processUserInput = function(userInput) {
                 if(!raceType)
                     {
 					console.log('Tu as demandé une course de type non reconnu.');
-					recastAnswer='Tu as demandé une course de type non reconnu.';
-					//sendMessage(userId,'Tu as demandé une course de type non reconnu.');
+					recAns('Tu as demandé une course de type non reconnu.');
 				}else
 				{
                     console.log('Tu as demandé une course de type '+raceType+'.');
-					recastAnswer='Tu as demandé une course de type '+raceType+'.';
-					//sendMessage(userId,'Tu as demandé une course de type '+raceType+'.');
+					recAns('Tu as demandé une course de type '+raceType+'.');
 				}	
             } else {
                 console.log('Je n\'ai pas compris s\'il y avait un type de course...');
-				recastAnswer='Je n\'ai pas compris s\'il y avait un type de course...';
+				recAns('Je n\'ai pas compris s\'il y avait un type de course...');
             }
             
             // Analyse the race period or date
@@ -262,34 +263,20 @@ var processUserInput = function(userInput) {
                 var range = getRaceDateRange(entityRaceDate.value);
                 if(range) {
                     console.log('Tu cherches une course en ' + range[0].toString() + ' et ' + range[1].toString() + ".");
-					recastAnswer='Tu cherches une course en ' + range[0].toString() + ' et ' + range[1].toString() + ".";
-					//sendMessage(userId,'Tu cherches une course en ' + range[0].toString() + ' et ' + range[1].toString() + ".");
-                } else {
+					recAns('Tu cherches une course en ' + range[0].toString() + ' et ' + range[1].toString() + ".");
+	            } else {
                     console.log('Je n\'ai pas compris pour quelle période tu recherches une course...');
-					recastAnswer='Je n\'ai pas compris pour quelle période tu recherches une course...';
-					//sendMessage(userId,'Je n\'ai pas compris pour quelle période tu recherches une course...');
-                }
+					recAns('Je n\'ai pas compris pour quelle période tu recherches une course...');
+		         }
             } else {
                 console.log('Je n\'ai pas compris s\'il y avait une période pour la course recherchée...');
-				recastAnswer='Je n\'ai pas compris s\'il y avait une période pour la course recherchée...';
-				//sendMessage(userId,'Je n\'ai pas compris s\'il y avait une période pour la course recherchée...');
-            }
+				recAns('Je n\'ai pas compris s\'il y avait une période pour la course recherchée...');
+	          }
             
         } else {
             console.log('Je n\'ai pas compris :-(');
-			recastAnswer='Je n\'ai pas compris :-(';
-			//sendMessage(userId,'Je n\'ai pas compris :-(');
-        }
+			recAns('Je n\'ai pas compris :-(');
+      }
     });
-    
-    
-/*
-            
-            let entityRaceDistance = response.get('distance');
-            let entityRaceLocation = response.get('location');
-            let entityRaceElevation = response.get('location');
-*/
-return recastAnswer;
-    
 };
 
