@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var app = express();
 var recastCli = require("./recastEngineClient.js");
 var fbMesApi = require("./fbMessengerApi.js");
+var dao = require("./dao.js");
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -18,6 +19,17 @@ console.log('Server start');
 
 // Server frontpage
 app.get('/', function (req, res) {
+
+	dao.getAllEventsBetweenSdEd("2016.06.19 00:00:00","2016.06.19 10:00:00",function(output)
+	{
+	 //res.render('index', {tasks: taskList});
+				for(var i=0;i<output.length;i++)
+				{
+					console.log("Event "+i+" "+output[i].name);
+				}
+	});
+	//console.log(allRaceType);
+	//res.send(allRaceType);
     res.send('This is TestBot Server');
 });
 
@@ -40,7 +52,7 @@ app.post('/webhook', function (req, res) {
         if (event.message && event.message.text) {
 			console.log('Received from FB Messenger :'+event.message.text);
 		    //sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
-			recastCli.processUserInput(event.message.text,function(recastAnswer)
+			recastCli.processUserInputnpm (event.message.text,function(recastAnswer)
 			{
 				console.log('Response from recast engine :'+recastAnswer);
 				fbMesApi.sendMessage(event.sender.id,recastAnswer);
